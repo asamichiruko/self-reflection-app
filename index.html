@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>振り返りアプリ</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            height: 100px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .achievement-item {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .achievement-content {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        .achievement-date {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .achievement-points {
+            font-weight: bold;
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+        .points-button {
+            background-color: #2ecc71;
+            font-size: 14px;
+            padding: 5px 10px;
+            margin-right: 5px;
+        }
+        .points-button:hover {
+            background-color: #27ae60;
+        }
+        .points-history {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background-color: #f1f1f1;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background-color: #3498db;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 0;
+            color: #7f8c8d;
+        }
+        .achievement-actions {
+            display: flex;
+            justify-content: space-between;
+        }
+        .delete-button {
+            background-color: #e74c3c;
+            font-size: 14px;
+            padding: 5px 10px;
+        }
+        .delete-button:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <h1>振り返りアプリ</h1>
+
+    <div class="tab-container">
+        <div class="tab active" data-tab="input">達成したことを記録</div>
+        <div class="tab" data-tab="list">達成リスト</div>
+    </div>
+
+    <div class="tab-content active" id="input-tab">
+        <div class="container">
+            <div class="form-group">
+                <label for="achievement">達成したこと</label>
+                <textarea id="achievement" placeholder="今日達成したことを入力してください..."></textarea>
+            </div>
+            <button id="save-btn">保存する</button>
+        </div>
+    </div>
+
+    <div class="tab-content" id="list-tab">
+        <div class="container">
+            <ul id="achievements-list">
+                <!-- 達成リストはJavaScriptで動的に生成されます -->
+            </ul>
+            <div class="empty-state" id="empty-state">
+                <p>達成したことがまだ記録されていません。</p>
+                <p>「達成したことを記録」タブから記録してみましょう！</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // データの初期化
+        if (!localStorage.getItem('achievements')) {
+            localStorage.setItem('achievements', JSON.stringify([]));
+        }
+
+        // DOM要素の取得
+        const achievementInput = document.getElementById('achievement');
+        const saveButton = document.getElementById('save-btn');
+        const achievementsList = document.getElementById('achievements-list');
+        const emptyState = document.getElementById('empty-state');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // タブ切り替え機能
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // タブのアクティブ状態を切り替え
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                // タブコンテンツの表示を切り替え
+                const tabName = tab.getAttribute('data-tab');
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(`${tabName}-tab`).classList.add('active');
+
+                // リストタブが選択された場合、リストを更新
+                if (tabName === 'list') {
+                    renderAchievements();
+                }
+            });
+        });
+
+        // 達成したことを保存する機能
+        saveButton.addEventListener('click', () => {
+            const achievementText = achievementInput.value.trim();
+            if (achievementText) {
+                const achievements = JSON.parse(localStorage.getItem('achievements'));
+                const newAchievement = {
+                    id: Date.now(), // ユニークIDとして現在のタイムスタンプを使用
+                    content: achievementText,
+                    date: new Date().toLocaleString('ja-JP'),
+                    points: 0,
+                    pointsHistory: []
+                };
+
+                achievements.push(newAchievement);
+                localStorage.setItem('achievements', JSON.stringify(achievements));
+
+                // 入力フィールドをクリア
+                achievementInput.value = '';
+
+                // 保存成功のフィードバック
+                alert('達成したことを記録しました！');
+
+                // リストタブに自動的に切り替え
+                tabs[1].click();
+            } else {
+                alert('達成したことを入力してください');
+            }
+        });
+
+        // 達成リストを表示する機能
+        function renderAchievements() {
+            const achievements = JSON.parse(localStorage.getItem('achievements'));
+
+            // 空の状態の表示/非表示を切り替え
+            if (achievements.length === 0) {
+                emptyState.style.display = 'block';
+                achievementsList.innerHTML = '';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+
+            // リストを最新の順に並べ替え
+            achievements.sort((a, b) => b.id - a.id);
+
+            // リストをレンダリング
+            achievementsList.innerHTML = achievements.map(achievement => {
+                // 加点履歴の表示
+                const pointsHistoryHTML = achievement.pointsHistory.map(entry => {
+                    return `<div>${entry.date}: +${entry.points}点 (${entry.reason || '理由なし'})</div>`;
+                }).join('');
+
+                return `
+                    <li class="achievement-item" data-id="${achievement.id}">
+                        <div class="achievement-content">${achievement.content}</div>
+                        <div class="achievement-date">記録日時: ${achievement.date}</div>
+                        <div class="achievement-points">合計ポイント: ${achievement.points}点</div>
+                        <div class="achievement-actions">
+                            <div>
+                                <button class="points-button" data-points="1" data-id="${achievement.id}">+1点</button>
+                                <button class="points-button" data-points="3" data-id="${achievement.id}">+3点</button>
+                                <button class="points-button" data-points="5" data-id="${achievement.id}">+5点</button>
+                                <button class="custom-points-button" data-id="${achievement.id}">カスタム加点</button>
+                            </div>
+                            <button class="delete-button" data-id="${achievement.id}">削除</button>
+                        </div>
+                        <div class="points-history">
+                            <h4>加点履歴:</h4>
+                            ${pointsHistoryHTML || '<div>まだ加点履歴はありません</div>'}
+                        </div>
+                    </li>
+                `;
+            }).join('');
+
+            // 加点ボタンのイベントリスナーを追加
+            document.querySelectorAll('.points-button').forEach(button => {
+                button.addEventListener('click', addPoints);
+            });
+
+            // カスタム加点ボタンのイベントリスナーを追加
+            document.querySelectorAll('.custom-points-button').forEach(button => {
+                button.addEventListener('click', addCustomPoints);
+            });
+
+            // 削除ボタンのイベントリスナーを追加
+            document.querySelectorAll('.delete-button').forEach(button => {
+                button.addEventListener('click', deleteAchievement);
+            });
+        }
+
+        // 加点機能
+        function addPoints(e) {
+            const achievementId = parseInt(e.target.getAttribute('data-id'));
+            const pointsToAdd = parseInt(e.target.getAttribute('data-points'));
+
+            const reason = prompt('加点理由（任意）:');
+            updatePoints(achievementId, pointsToAdd, reason);
+        }
+
+        // カスタム加点機能
+        function addCustomPoints(e) {
+            const achievementId = parseInt(e.target.getAttribute('data-id'));
+            const pointsInput = prompt('加点するポイント数を入力してください:');
+
+            if (pointsInput === null) return;
+
+            const pointsToAdd = parseInt(pointsInput);
+            if (isNaN(pointsToAdd) || pointsToAdd <= 0) {
+                alert('有効な正の数値を入力してください');
+                return;
+            }
+
+            const reason = prompt('加点理由（任意）:');
+            updatePoints(achievementId, pointsToAdd, reason);
+        }
+
+        // ポイント更新の共通処理
+        function updatePoints(achievementId, pointsToAdd, reason) {
+            const achievements = JSON.parse(localStorage.getItem('achievements'));
+            const achievementIndex = achievements.findIndex(a => a.id === achievementId);
+
+            if (achievementIndex !== -1) {
+                // ポイントを加算
+                achievements[achievementIndex].points += pointsToAdd;
+
+                // 加点履歴に追加
+                achievements[achievementIndex].pointsHistory.push({
+                    date: new Date().toLocaleString('ja-JP'),
+                    points: pointsToAdd,
+                    reason: reason
+                });
+
+                localStorage.setItem('achievements', JSON.stringify(achievements));
+                renderAchievements();
+            }
+        }
+
+        // 達成の削除機能
+        function deleteAchievement(e) {
+            if (!confirm('この達成を削除してもよろしいですか？この操作は取り消せません。')) {
+                return;
+            }
+
+            const achievementId = parseInt(e.target.getAttribute('data-id'));
+            let achievements = JSON.parse(localStorage.getItem('achievements'));
+
+            achievements = achievements.filter(a => a.id !== achievementId);
+            localStorage.setItem('achievements', JSON.stringify(achievements));
+
+            renderAchievements();
+        }
+
+        // 初期表示時にアクティブなタブのコンテンツを表示
+        document.addEventListener('DOMContentLoaded', () => {
+            const activeTab = document.querySelector('.tab.active');
+            if (activeTab) {
+                const tabName = activeTab.getAttribute('data-tab');
+                if (tabName === 'list') {
+                    renderAchievements();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
