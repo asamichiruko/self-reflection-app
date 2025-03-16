@@ -1,0 +1,127 @@
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 30px;
+}
+.container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+.form-group {
+    margin-bottom: 15px;
+}
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    height: 100px;
+    font-size: 16px;
+}
+button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+button:hover {
+    background-color: #2980b9;
+}
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+.achievement-item {
+    background-color: #f8f9fa;
+    border-left: 4px solid #3498db;
+    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 4px;
+}
+.achievement-content {
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+.achievement-date {
+    color: #7f8c8d;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+.achievement-points {
+    font-weight: bold;
+    color: #27ae60;
+    margin-bottom: 10px;
+}
+.points-button {
+    background-color: #2ecc71;
+    font-size: 14px;
+    padding: 5px 10px;
+    margin-right: 5px;
+}
+.points-button:hover {
+    background-color: #27ae60;
+}
+.points-history {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #7f8c8d;
+}
+.tab-container {
+    display: flex;
+    margin-bottom: 20px;
+}
+.tab {
+    padding: 10px 20px;
+    background-color: #f1f1f1;
+    cursor: pointer;
+    border-radius: 4px 4px 0 0;
+    margin-right: 5px;
+}
+.tab.active {
+    background-color: #3498db;
+    color: white;
+}
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+}
+.empty-state {
+    text-align: center;
+    padding: 40px 0;
+    color: #7f8c8d;
+}
+.achievement-actions {
+    display: flex;
+    justify-content: space-between;
+}
+.delete-button {
+    background-color: #e74c3c;
+    font-size: 14px;
+    padding: 5px 10px;
+}
+.delete-button:hover {
+    background-color: #c0392b;
+}

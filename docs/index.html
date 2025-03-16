@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>振り返りアプリ</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <h1>振り返りアプリ</h1>
+
+    <div class="tab-container">
+        <div class="tab active" data-tab="input">達成したことを記録</div>
+        <div class="tab" data-tab="list">達成リスト</div>
+    </div>
+
+    <div class="tab-content active" id="input-tab">
+        <div class="container">
+            <div class="form-group">
+                <label for="achievement">達成したこと</label>
+                <textarea id="achievement" placeholder="今日達成したことを入力してください..."></textarea>
+            </div>
+            <button id="save-btn">保存する</button>
+        </div>
+    </div>
+
+    <div class="tab-content" id="list-tab">
+        <div class="container">
+            <ul id="achievements-list">
+                <!-- 達成リストはJavaScriptで動的に生成されます -->
+            </ul>
+            <div class="empty-state" id="empty-state">
+                <p>達成したことがまだ記録されていません。</p>
+                <p>「達成したことを記録」タブから記録してみましょう！</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="./js/app.js"></script>
+</body>
+</html>

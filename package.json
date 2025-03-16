@@ -1,1 +1,16 @@
-{}
+{
+  "name": "self-reflection-app",
+  "description": "自己達成感を高めるための振り返りアプリです。達成したことを記録したり、記録を振り返って自由に加点したりすることができます。",
+  "version": "1.0.0",
+  "devDependencies": {
+    "gh-pages": "^6.3.0",
+    "parcel": "^2.13.3"
+  },
+  "scripts": {
+    "dev": "parcel docs/index.html",
+    "build": "parcel build docs/index.html --dist-dir dist",
+    "clean": "rm -rf dist .parcel-cache",
+    "predeploy": "npm run clean && npm run build",
+    "deploy": "gh-pages -d dist"
+  }
+}
