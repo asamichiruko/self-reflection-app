@@ -3,7 +3,14 @@
   "description": "自己達成感を高めるための振り返りアプリです。達成したことを記録したり、記録を振り返って自由に加点したりすることができます。",
   "version": "1.0.0",
   "devDependencies": {
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "parcel": "^2.13.3"
   },
-  "scripts": {}
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/.bin/jest"
+  }
 }
