@@ -3,10 +3,10 @@ export function getAchievements() {
     if (!localStorage.getItem('achievements')) {
         localStorage.setItem('achievements', JSON.stringify([]));
     }
-    return JSON.parse(localStorage.getItem('achievements'))
+    return JSON.parse(localStorage.getItem('achievements'));
 }
 
-// 新しい達成項目を保存
+// 新しい達成項目を LocalStorage に保存
 export function saveAchievement(achievementText) {
     const achievements = getAchievements();
     const newAchievement = {
@@ -44,7 +44,7 @@ export function updatePoints(achievementId, pointsToAdd, reason) {
     return false;
 }
 
-// 達成の削除機能
+// 達成事項の削除
 export function deleteAchievement(achievementId) {
     let achievements = getAchievements();
     achievements = achievements.filter(a => a.id !== achievementId);
