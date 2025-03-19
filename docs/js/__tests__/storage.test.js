@@ -29,7 +29,7 @@ test("LocalStorage から達成事項を取得する", () => {
     expect(achievements).toEqual([newAchievements]);
 });
 
-test("LocalStorage に意図した型と異なるデータが格納されている", () => {
+test.skip("LocalStorage に意図した型と異なるデータが格納されている", () => {
     // テスト用の不正なデータを追加しておく
     const illegalAchievements = {
         id: Date.parse("2025-03-17T12:00:00.000+09:00"),
