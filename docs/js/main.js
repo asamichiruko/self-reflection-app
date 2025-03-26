@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const recordView = new RecordView(recordViewModel, recordListElement);
 
     // データファイルのインポート・エクスポート
+    const settingsView = new SettingsView(recordViewModel);
 });
 
 class Storage {
@@ -146,14 +147,14 @@ class RecordModel {
         return records;
     }
 
-    exportAsJSON() {
+    exportAsJsonString() {
         const achievements = this.storage.loadAchievements();
         const stars = this.storage.loadStars();
         const exportObject = { achievements, stars };
         return JSON.stringify(exportObject);
     }
 
-    importFromJSON(jsonString) {
+    importFromJsonString(jsonString) {
         const parsedData = JSON.parse(jsonString);
         const achievements = parsedData["achievements"];
         const stars = parsedData["stars"];
@@ -164,6 +165,7 @@ class RecordModel {
 
         this.storage.importAchievements(achievements);
         this.storage.importStars(stars);
+        this.notify();
         return true;
     }
 }
@@ -196,6 +198,14 @@ class RecordViewModel {
 
     getRecords() {
         return this.model.getRecords();
+    }
+
+    exportAsJsonString() {
+        return this.model.exportAsJsonString();
+    }
+
+    importFromJsonString(jsonString) {
+        return this.model.importFromJsonString(jsonString);
     }
 }
 
@@ -456,5 +466,47 @@ class TabView {
     activateTab(e) {
         const tabName = e.target.getAttribute("tab-name");
         this.viewModel.notify(tabName);
+    }
+}
+
+class SettingsView {
+    constructor(recordViewModel) {
+        this.recordViewModel = recordViewModel;
+
+        this.exportButton = document.getElementById("export-btn");
+        this.exportButton.addEventListener("click", this.exportRecordsEventListener.bind(this));
+
+        this.importFile = document.getElementById("import-file");
+        this.importButton = document.getElementById("import-btn");
+        this.importButton.addEventListener("click", this.importRecordsEventListener.bind(this));
+    }
+
+    render() {}
+
+    exportRecordsEventListener() {
+        const jsonString = this.recordViewModel.exportAsJsonString();
+        const blob = new Blob([jsonString], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "export_data.json";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    async importRecordsEventListener() {
+        const file = this.importFile.files[0];
+        if (!file || file.type !== "application/json") {
+            console.log(file);
+            alert(".json形式のファイルを選択してください");
+            return;
+        }
+        const jsonString = await file.text();
+        const result = this.recordViewModel.importFromJsonString(jsonString);
+        if (result) {
+            alert("データの復元を完了しました");
+        }
     }
 }
