@@ -3,39 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>振り返りアプリ</title>
+    <title>できたことあつめ</title>
     <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
-    <h1>振り返りアプリ</h1>
+    <h1>できたことあつめ</h1>
 
     <div class="tab-container">
-        <div class="tab active" data-tab="input">達成したことを記録</div>
-        <div class="tab" data-tab="list">達成リスト</div>
+        <div class="tab active" tab-name="input">できたことの記録</div>
+        <div class="tab" tab-name="list">できたことリスト</div>
+        <div class="tab" tab-name="settings">設定</div>
     </div>
 
-    <div class="tab-content active" id="input-tab">
+    <div class="tab-content active" id="input-tab" tab-name="input">
         <div class="container">
             <div class="form-group">
-                <label for="achievement">達成したこと</label>
-                <textarea id="achievement" placeholder="今日達成したことを入力してください..."></textarea>
+                <label for="achievement">できたこと</label>
+                <textarea id="achievement" placeholder="できたことを教えてください..."></textarea>
             </div>
-            <button id="save-btn">保存する</button>
+            <button id="save-btn">記録する</button>
         </div>
     </div>
 
-    <div class="tab-content" id="list-tab">
+    <div class="tab-content" id="list-tab" tab-name="list">
         <div class="container">
-            <ul id="achievements-list">
-                <!-- 達成リストはJavaScriptで動的に生成されます -->
-            </ul>
-            <div class="empty-state" id="empty-state">
-                <p>達成したことがまだ記録されていません。</p>
-                <p>「達成したことを記録」タブから記録してみましょう！</p>
-            </div>
+            <ul id="achievements-list"></ul>
+            <div id="empty-state" class="empty-state"></div>
         </div>
     </div>
 
-    <script type="module" src="./js/app.js"></script>
+    <div class="tab-content" id="settings-tab" tab-name="settings">
+        <div class="container">
+            <p>現在ブラウザにあるデータをJSON形式のファイルとしてダウンロードします。保存したファイルを使って後からデータを復元できます。</p>
+            <p><button id="export-btn">現在のデータをダウンロードする</button></p>
+            <p>保存したJSON形式のファイルをアップロードし、ブラウザにデータを復元します。いまブラウザに残っているデータは上書きせず、差分のデータだけを追加します。</p>
+            <p><input id="import-file" type="file"></input></p>
+            <p><button id="import-btn">ファイルをアップロードして復元する</button></p>
+        </div>
+    </div>
+
+    <script type="module" src="./js/main.js"></script>
 </body>
 </html>
