@@ -31,23 +31,22 @@ class Storage {
     }
 
     addAchievement(id, content, date) {
+        const achievement = convertToAchievement({ id, content, date });
+        if (!achievement) {
+            return;
+        }
         const achievements = this.loadAchievements();
-        achievements.push({
-            id,
-            content,
-            date
-        });
+        achievements.push(achievement);
         this.saveAchievements(achievements);
     }
 
     addStar(id, achievementId, content, date) {
+        const star = convertToStar({ id, achievementId, content, date });
+        if (!star) {
+            return;
+        }
         const stars = this.loadStars();
-        stars.push({
-            id,
-            achievementId,
-            content,
-            date
-        });
+        stars.push(star);
         this.saveStars(stars);
     }
 
@@ -65,11 +64,18 @@ class Storage {
         return crypto.randomUUID();
     }
 
+    isValidId(id) {
+        const uuidRegex =
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        return uuidRegex.test(id);
+    }
+
     importAchievements(achievements) {
         const storageAchievements = this.loadAchievements();
         const achievementIds = new Set(storageAchievements.map((a) => a.id));
         achievements.forEach((a) => {
-            if (achievementIds.has(a.id)) {
+            a = convertToAchievement(a);
+            if (!a || achievementIds.has(a.id)) {
                 return;
             }
             achievementIds.add(a.id);
@@ -84,13 +90,61 @@ class Storage {
         const starIds = new Set(storageStars.map((a) => a.id));
         const achievementIds = new Set(achievements.map((a) => a.id));
         stars.forEach((a) => {
-            if (starIds.has(a.id) || !achievementIds.has(a.achievementId)) {
+            a = convertToStar(a);
+            if (!a || starIds.has(a.id) || !achievementIds.has(a.achievementId)) {
                 return;
             }
             starIds.add(a.id);
             storageStars.push(a);
         });
         this.saveStars(storageStars);
+    }
+
+    convertToAchievement(obj) {
+        const achievement = {};
+
+        if (!obj.id || !isValidId(id)) {
+            return null;
+        }
+        achievement.id = obj.id;
+
+        if (!obj.content) {
+            return null;
+        }
+        achievement.content = String(obj.content);
+
+        if (!obj.date || new Date(obj.date).toString() === "Invalid Date") {
+            return null;
+        }
+        achievement.date = new Date(obj.date).toISOString();
+
+        return achievement;
+    }
+
+    convertToStar(obj) {
+        const star = {};
+
+        if (!obj.id || !isValidId(obj.id)) {
+            return null;
+        }
+        star.id = obj.id;
+
+        if (!obj.achievementId || !isValidId(obj.achievementId)) {
+            return null;
+        }
+        star.achievementId = obj.achievementId;
+
+        if (!obj.content) {
+            return null;
+        }
+        star.content = String(obj.content);
+
+        if (!obj.date || new Date(obj.date).toString() === "Invalid Date") {
+            return null;
+        }
+        star.date = new Date(obj.date).toISOString();
+
+        return star;
     }
 }
 
