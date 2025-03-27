@@ -138,8 +138,8 @@ class RecordModel {
     }
 
     exportAsJsonString() {
-        const achievements = this.storage.loadAchievements();
-        const stars = this.storage.loadStars();
+        const achievements = this.storage.getAchievements();
+        const stars = this.storage.getStars();
         const exportObject = { achievements, stars };
         return JSON.stringify(exportObject);
     }
