@@ -28,7 +28,9 @@ label {
     font-weight: bold;
 }
 textarea {
-    width: 100%;
+    width: -webkit-fill-available;
+    width: -moz-available;
+    width: stretch;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
