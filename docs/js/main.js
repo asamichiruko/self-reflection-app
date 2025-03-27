@@ -5,19 +5,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const recordModel = new RecordModel();
     const recordViewModel = new RecordViewModel(recordModel);
 
-    // タブの切替
-    const tabElements = document.querySelectorAll(".tab-container .tab");
-    const tabContentElements = document.querySelectorAll(".tab-content");
-    const tabView = new TabView(tabViewModel, tabElements, tabContentElements);
-
-    // achievement の入力と保存
+    const tabView = new TabView(tabViewModel);
     const inputView = new InputView(recordViewModel, tabViewModel);
-
-    // できたことの一覧
-    const recordListElement = document.querySelector("#list-tab .container");
-    const recordView = new RecordView(recordViewModel, recordListElement);
-
-    // データファイルのインポート・エクスポート
+    const recordView = new RecordView(recordViewModel);
     const settingsView = new SettingsView(recordViewModel);
 });
 
@@ -210,13 +200,13 @@ class RecordViewModel {
 }
 
 class RecordView {
-    constructor(recordViewModel, rootElement) {
+    constructor(recordViewModel) {
         this.recordViewModel = recordViewModel;
-        this.rootElement = rootElement;
-
         this.recordViewModel.subscribe(() => {
             this.render(this.recordViewModel.getRecords());
         });
+
+        this.rootElement = document.querySelector("#list-tab .container");
 
         this.render(this.recordViewModel.getRecords());
     }
@@ -431,12 +421,12 @@ class TabViewModel {
 }
 
 class TabView {
-    constructor(viewModel, tabElements, tabContentElements) {
+    constructor(viewModel) {
         this.viewModel = viewModel;
-        this.tabElements = tabElements;
-        this.tabContentElements = tabContentElements;
-
         this.viewModel.subscribe((activeTab) => this.render(activeTab));
+
+        this.tabElements = document.querySelectorAll(".tab-container .tab");
+        this.tabContentElements = document.querySelectorAll(".tab-content");
 
         this.tabElements.forEach((tab) => {
             tab.addEventListener("click", this.activateTab.bind(this));
