@@ -49,7 +49,7 @@ describe("Storage", () => {
         test("storageに1つのachievementを追加する", () => {
             const storage = new Storage();
             const newAchievement = validAchievements[0];
-            storage.addAchievement(newAchievement.id, newAchievement.content, newAchievement.date);
+            storage.addAchievement(newAchievement);
 
             expect(storage.getAchievements()).toContainEqual(newAchievement);
         });
@@ -57,7 +57,7 @@ describe("Storage", () => {
         test("storageにidの異なるachievementsを追加する", () => {
             const storage = new Storage();
             for (let achievement of validAchievements) {
-                storage.addAchievement(achievement.id, achievement.content, achievement.date);
+                storage.addAchievement(achievement);
             }
 
             expect(storage.getAchievements()).toEqual(validAchievements);
@@ -66,15 +66,15 @@ describe("Storage", () => {
         test("localStorageに1つのstarを追加する", () => {
             const storage = new Storage();
             const newStar = validStars[0];
-            storage.addStar(star.id, star.achievementId, star.content, star.date);
+            storage.addStar(newStar);
 
-            expect(storage.toContainEqual(newStar));
+            expect(storage.getStars()).toContainEqual(newStar);
         });
 
         test("localStorageにidの異なるstarsを追加する", () => {
             const storage = new Storage();
             for (let star of validStars) {
-                storage.addStar(star.id, star.achievementId, star.content, star.date);
+                storage.addStar(star);
             }
 
             expect(storage.getStars()).toEqual(validStars);
@@ -82,13 +82,15 @@ describe("Storage", () => {
 
         test("storageにidの異なるachievementsをまとめて追加する", () => {
             const storage = new Storage();
-            storage.importAchievements(validAchievements);
+            storage.addAchievements(validAchievements);
             expect(storage.getAchievements()).toEqual(validAchievements);
         });
 
         test("storageにidの異なるstarsをまとめて追加する", () => {
             const storage = new Storage();
-            storage.importStars(validStars);
+            // 対応する achievement が必要
+            storage.addAchievements(validAchievements);
+            storage.addStars(validStars);
             expect(storage.getStars()).toEqual(validStars);
         });
     });

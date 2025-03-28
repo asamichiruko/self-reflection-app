@@ -30,9 +30,9 @@ export class Storage {
         localStorage.setItem("stars", JSON.stringify(stars));
     }
 
-    addAchievement(id, content, date) {
-        const achievement = this.convertToAchievement({ id, content, date });
-        if (!achievement) {
+    addAchievement({ id, content, date }) {
+        const achievement = { id, content, date };
+        if (!this.isValidAchievement(achievement)) {
             return;
         }
         const achievements = this.loadAchievements();
@@ -40,9 +40,9 @@ export class Storage {
         this.saveAchievements(achievements);
     }
 
-    addStar(id, achievementId, content, date) {
-        const star = this.convertToStar({ id, achievementId, content, date });
-        if (!star) {
+    addStar({ id, achievementId, content, date }) {
+        const star = { id, achievementId, content, date };
+        if (!this.isValidStar(star)) {
             return;
         }
         const stars = this.loadStars();
@@ -67,84 +67,65 @@ export class Storage {
     isValidId(id) {
         const uuidRegex =
             /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-        return uuidRegex.test(id);
+        return id && uuidRegex.test(id);
     }
 
-    importAchievements(achievements) {
+    addAchievements(achievements) {
         const storageAchievements = this.loadAchievements();
         const achievementIds = new Set(storageAchievements.map((a) => a.id));
         achievements.forEach((a) => {
-            a = this.convertToAchievement(a);
-            if (!a || achievementIds.has(a.id)) {
+            const achievement = { id: a.id, content: a.content, date: a.date };
+            if (!this.isValidAchievement(achievement) || achievementIds.has(a.id)) {
                 return;
             }
             achievementIds.add(a.id);
-            storageAchievements.push(a);
+            storageAchievements.push(achievement);
         });
         this.saveAchievements(storageAchievements);
     }
 
-    importStars(stars) {
+    addStars(stars) {
         const achievements = this.loadAchievements();
         const storageStars = this.loadStars();
         const starIds = new Set(storageStars.map((a) => a.id));
         const achievementIds = new Set(achievements.map((a) => a.id));
         stars.forEach((a) => {
-            a = this.convertToStar(a);
-            if (!a || starIds.has(a.id) || !achievementIds.has(a.achievementId)) {
+            const star = {
+                id: a.id,
+                achievementId: a.achievementId,
+                content: a.content,
+                date: a.date
+            };
+            if (
+                !this.isValidStar(star) ||
+                starIds.has(a.id) ||
+                !achievementIds.has(a.achievementId)
+            ) {
                 return;
             }
             starIds.add(a.id);
-            storageStars.push(a);
+            storageStars.push(star);
         });
         this.saveStars(storageStars);
     }
 
-    convertToAchievement(obj) {
-        const achievement = {};
+    isValidAchievement({ id, content, date }) {
+        let isValid = true;
+        isValid = isValid && this.isValidId(id);
+        isValid = isValid && content && content !== "";
+        isValid = isValid && new Date(date).toString() !== "Invalid Date";
 
-        if (!obj.id || !this.isValidId(obj.id)) {
-            return null;
-        }
-        achievement.id = obj.id;
-
-        if (!obj.content) {
-            return null;
-        }
-        achievement.content = String(obj.content);
-
-        if (!obj.date || new Date(obj.date).toString() === "Invalid Date") {
-            return null;
-        }
-        achievement.date = new Date(obj.date).toISOString();
-
-        return achievement;
+        return isValid;
     }
 
-    convertToStar(obj) {
-        const star = {};
+    isValidStar({ id, achievementId, content, date }) {
+        let isValid = true;
+        isValid = isValid && this.isValidId(id);
+        isValid = isValid && this.isValidId(achievementId);
+        isValid = isValid && content && content !== "";
+        isValid = isValid && new Date(date).toString() !== "Invalid Date";
 
-        if (!obj.id || !this.isValidId(obj.id)) {
-            return null;
-        }
-        star.id = obj.id;
-
-        if (!obj.achievementId || !this.isValidId(obj.achievementId)) {
-            return null;
-        }
-        star.achievementId = obj.achievementId;
-
-        if (!obj.content) {
-            return null;
-        }
-        star.content = String(obj.content);
-
-        if (!obj.date || new Date(obj.date).toString() === "Invalid Date") {
-            return null;
-        }
-        star.date = new Date(obj.date).toISOString();
-
-        return star;
+        return isValid;
     }
 }
 
@@ -164,13 +145,18 @@ class RecordModel {
 
     addAchievement(content) {
         const id = this.storage.generateId();
-        this.storage.addAchievement(id, content, new Date());
+        this.storage.addAchievement({ id: id, content: content, date: new Date() });
         this.notify();
     }
 
     addStar(achievementId, content) {
         const id = this.storage.generateId();
-        this.storage.addStar(id, achievementId, content, new Date());
+        this.storage.addStar({
+            id: id,
+            achievementId: achievementId,
+            content: content,
+            date: new Date()
+        });
         this.notify();
     }
 
@@ -207,8 +193,8 @@ class RecordModel {
             return false;
         }
 
-        this.storage.importAchievements(achievements);
-        this.storage.importStars(stars);
+        this.storage.addAchievements(achievements);
+        this.storage.addStars(stars);
         this.notify();
         return true;
     }
