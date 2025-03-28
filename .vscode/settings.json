@@ -11,5 +11,6 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "npm.packageManager": "npm",
-    "typescript.enablePromptUseWorkspaceTsdk": true
+    "typescript.enablePromptUseWorkspaceTsdk": true,
+    "vitest.nodeExecutable": "/usr/local/bin/node"
 }

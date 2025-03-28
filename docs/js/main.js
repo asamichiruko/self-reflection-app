@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const settingsView = new SettingsView(recordViewModel);
 });
 
-class Storage {
+export class Storage {
     constructor() {}
 
     loadAchievements() {
@@ -31,7 +31,7 @@ class Storage {
     }
 
     addAchievement(id, content, date) {
-        const achievement = convertToAchievement({ id, content, date });
+        const achievement = this.convertToAchievement({ id, content, date });
         if (!achievement) {
             return;
         }
@@ -41,7 +41,7 @@ class Storage {
     }
 
     addStar(id, achievementId, content, date) {
-        const star = convertToStar({ id, achievementId, content, date });
+        const star = this.convertToStar({ id, achievementId, content, date });
         if (!star) {
             return;
         }
@@ -74,7 +74,7 @@ class Storage {
         const storageAchievements = this.loadAchievements();
         const achievementIds = new Set(storageAchievements.map((a) => a.id));
         achievements.forEach((a) => {
-            a = convertToAchievement(a);
+            a = this.convertToAchievement(a);
             if (!a || achievementIds.has(a.id)) {
                 return;
             }
@@ -90,7 +90,7 @@ class Storage {
         const starIds = new Set(storageStars.map((a) => a.id));
         const achievementIds = new Set(achievements.map((a) => a.id));
         stars.forEach((a) => {
-            a = convertToStar(a);
+            a = this.convertToStar(a);
             if (!a || starIds.has(a.id) || !achievementIds.has(a.achievementId)) {
                 return;
             }
@@ -103,7 +103,7 @@ class Storage {
     convertToAchievement(obj) {
         const achievement = {};
 
-        if (!obj.id || !isValidId(id)) {
+        if (!obj.id || !this.isValidId(obj.id)) {
             return null;
         }
         achievement.id = obj.id;
@@ -124,12 +124,12 @@ class Storage {
     convertToStar(obj) {
         const star = {};
 
-        if (!obj.id || !isValidId(obj.id)) {
+        if (!obj.id || !this.isValidId(obj.id)) {
             return null;
         }
         star.id = obj.id;
 
-        if (!obj.achievementId || !isValidId(obj.achievementId)) {
+        if (!obj.achievementId || !this.isValidId(obj.achievementId)) {
             return null;
         }
         star.achievementId = obj.achievementId;
