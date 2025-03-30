@@ -2,7 +2,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const tabModel = new TabModel();
     const tabViewModel = new TabViewModel(tabModel);
 
-    const recordModel = new RecordModel();
+    const storage = new Storage();
+    const recordModel = new RecordModel(storage);
     const recordViewModel = new RecordViewModel(recordModel);
 
     const tabView = new TabView(tabViewModel);
@@ -33,30 +34,40 @@ export class Storage {
     addAchievement({ id, content, date }) {
         const achievement = { id, content, date };
         if (!this.isValidAchievement(achievement)) {
-            return;
+            return false;
         }
         const achievements = this.loadAchievements();
         achievements.push(achievement);
         this.saveAchievements(achievements);
+        return true;
     }
 
     addStar({ id, achievementId, content, date }) {
         const star = { id, achievementId, content, date };
         if (!this.isValidStar(star)) {
-            return;
+            return false;
         }
         const stars = this.loadStars();
         stars.push(star);
         this.saveStars(stars);
+        return true;
     }
 
     getAchievements() {
-        const achievements = this.loadAchievements();
+        let achievements = this.loadAchievements();
+        achievements.map((a) => {
+            a.date = new Date(a.date);
+            return a;
+        });
         return achievements;
     }
 
     getStars() {
         const stars = this.loadStars();
+        stars.map((a) => {
+            a.date = new Date(a.date);
+            return a;
+        });
         return stars;
     }
 
@@ -129,9 +140,9 @@ export class Storage {
     }
 }
 
-class RecordModel {
-    constructor() {
-        this.storage = new Storage();
+export class RecordModel {
+    constructor(storage) {
+        this.storage = storage;
         this.listeners = [];
     }
 
@@ -143,21 +154,24 @@ class RecordModel {
         this.listeners.forEach((listener) => listener());
     }
 
-    addAchievement(content) {
+    addAchievement({ content }) {
         const id = this.storage.generateId();
-        this.storage.addAchievement({ id: id, content: content, date: new Date() });
-        this.notify();
+        const date = new Date();
+        const result = this.storage.addAchievement({ id, content, date });
+        if (result) {
+            this.notify();
+        }
+        return result;
     }
 
-    addStar(achievementId, content) {
+    addStar({ achievementId, content }) {
         const id = this.storage.generateId();
-        this.storage.addStar({
-            id: id,
-            achievementId: achievementId,
-            content: content,
-            date: new Date()
-        });
-        this.notify();
+        const date = new Date();
+        const result = this.storage.addStar({ id, achievementId, content, date });
+        if (result) {
+            this.notify();
+        }
+        return result;
     }
 
     getRecords() {
@@ -166,11 +180,10 @@ class RecordModel {
         const result = Map.groupBy(stars, (star) => {
             return star.achievementId;
         });
-        achievements.sort((a, b) => new Date(b.date) - new Date(a.date));
         const records = achievements.map((a) => {
             return {
                 achievement: a,
-                stars: result.get(a.id)
+                stars: result.get(a.id) || []
             };
         });
 
@@ -186,12 +199,20 @@ class RecordModel {
 
     importFromJsonString(jsonString) {
         const parsedData = JSON.parse(jsonString);
-        const achievements = parsedData["achievements"];
-        const stars = parsedData["stars"];
+        let achievements = parsedData["achievements"];
+        let stars = parsedData["stars"];
         if (!Array.isArray(achievements) || !Array.isArray(stars)) {
             console.warn(`Invalid data type: ${parsedData}`);
             return false;
         }
+        achievements.map((a) => {
+            a.date = new Date(a.date);
+            return a;
+        });
+        stars.map((a) => {
+            a.date = new Date(a.date);
+            return a;
+        });
 
         this.storage.addAchievements(achievements);
         this.storage.addStars(stars);
@@ -216,14 +237,14 @@ class RecordViewModel {
         this.listeners.forEach((listener) => listener(this));
     }
 
-    addAchievement(content) {
+    addAchievement({ content }) {
         if (content.trim()) {
-            this.model.addAchievement(content);
+            this.model.addAchievement({ content });
         }
     }
 
-    addStar(achievementId, content) {
-        this.model.addStar(achievementId, content);
+    addStar({ achievementId, content }) {
+        this.model.addStar({ achievementId, content });
     }
 
     getRecords() {
@@ -256,6 +277,7 @@ class RecordView {
         if (!records || records.length === 0) {
             this.renderEmptyState();
         } else {
+            records.sort((a, b) => b.achievement.date - a.achievement.date);
             this.renderRecordList(records);
         }
     }
@@ -387,7 +409,7 @@ class RecordView {
         }
 
         const achievementId = e.target.getAttribute("achievement-id");
-        this.recordViewModel.addStar(achievementId, content);
+        this.recordViewModel.addStar({ achievementId, content });
     }
 }
 
@@ -408,7 +430,7 @@ class InputView {
             alert("できたことを入力してください");
             return;
         }
-        this.recordViewModel.addAchievement(this.achievementInput.value);
+        this.recordViewModel.addAchievement({ content: this.achievementInput.value });
         this.achievementInput.value = "";
         alert("できたことを記録しました！");
         this.tabViewModel.setActiveTab("list");
