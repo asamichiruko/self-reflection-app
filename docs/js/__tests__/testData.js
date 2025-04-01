@@ -26,7 +26,7 @@ export const validStars = [
     {
         id: "a47baaac-afe5-4447-87b5-943445304725",
         achievementId: "ecaf3f79-5cad-4783-9739-321b392690a1",
-        content: "valid star 2 (following achievement 2)",
+        content: "",
         date: new Date("2025-04-02 09:30:00")
     },
     {

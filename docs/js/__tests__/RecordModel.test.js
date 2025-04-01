@@ -68,6 +68,7 @@ describe("RecordModel", () => {
         );
         expect(records).toEqual(sortedValidRecords);
     });
+
     test("achievement, starsをJSON文字列でexportする", () => {
         mockStorage.getAchievements.mockReturnValue(validAchievements);
         mockStorage.getStars.mockReturnValue(validStars);
@@ -76,6 +77,7 @@ describe("RecordModel", () => {
         expect(json.achievements).toEqual(validAchievements);
         expect(json.stars).toEqual(validStars);
     });
+
     test("JSON文字列からrecordをimportするとlistenerが呼ばれる", () => {
         const listener = vi.fn();
         recordModel.subscribe(listener);

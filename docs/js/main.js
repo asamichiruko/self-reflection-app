@@ -221,7 +221,7 @@ export class RecordModel {
     }
 }
 
-class RecordViewModel {
+export class RecordViewModel {
     constructor(recordModel) {
         this.model = recordModel;
         this.listeners = [];
@@ -239,12 +239,12 @@ class RecordViewModel {
 
     addAchievement({ content }) {
         if (content.trim()) {
-            this.model.addAchievement({ content });
+            return this.model.addAchievement({ content });
         }
     }
 
     addStar({ achievementId, content }) {
-        this.model.addStar({ achievementId, content });
+        return this.model.addStar({ achievementId, content });
     }
 
     getRecords() {
@@ -260,7 +260,7 @@ class RecordViewModel {
     }
 }
 
-class RecordView {
+export class RecordView {
     constructor(recordViewModel) {
         this.recordViewModel = recordViewModel;
         this.recordViewModel.subscribe(() => {
@@ -305,7 +305,15 @@ class RecordView {
 
         const buttons = document.querySelectorAll(".star-button");
         buttons.forEach((button) => {
-            button.addEventListener("click", this.addStarEventListener.bind(this));
+            button.addEventListener("click", (e) => {
+                const content = prompt("コメント（任意）");
+                if (content == null) {
+                    return;
+                }
+
+                const achievementId = e.target.getAttribute("achievement-id");
+                this.recordViewModel.addStar({ achievementId, content });
+            });
         });
     }
 
@@ -401,19 +409,9 @@ class RecordView {
         elem.textContent = `${new Date(star.date).toLocaleString()}: ${star.content || "理由を問わず"}`;
         return elem;
     }
-
-    addStarEventListener(e) {
-        const content = prompt("コメント（任意）");
-        if (content == null) {
-            return;
-        }
-
-        const achievementId = e.target.getAttribute("achievement-id");
-        this.recordViewModel.addStar({ achievementId, content });
-    }
 }
 
-class InputView {
+export class InputView {
     constructor(recordViewModel, tabViewModel) {
         this.recordViewModel = recordViewModel;
         this.tabViewModel = tabViewModel;
@@ -437,7 +435,7 @@ class InputView {
     }
 }
 
-class TabModel {
+export class TabModel {
     constructor() {
         this.activeTab = "input";
         this.listeners = [];
@@ -457,7 +455,7 @@ class TabModel {
     }
 }
 
-class TabViewModel {
+export class TabViewModel {
     constructor(model) {
         this.model = model;
         this.listeners = [];
@@ -482,7 +480,7 @@ class TabViewModel {
     }
 }
 
-class TabView {
+export class TabView {
     constructor(viewModel) {
         this.viewModel = viewModel;
         this.viewModel.subscribe((activeTab) => this.render(activeTab));
@@ -521,7 +519,7 @@ class TabView {
     }
 }
 
-class SettingsView {
+export class SettingsView {
     constructor(recordViewModel) {
         this.recordViewModel = recordViewModel;
 
