@@ -62,17 +62,19 @@ describe("RecordView", () => {
         }
 
         const buttons = document.querySelectorAll(".star-button");
-        const originalPrompt = prompt;
-        prompt = vi.fn(() => "test prompt");
+        const mockPrompt = vi.spyOn(globalThis, "prompt").mockReturnValue("test prompt");
+
         buttons.forEach((button) => {
             button.click();
+
+            expect(mockPrompt).toHaveBeenCalled();
             expect(mockViewModel.addStar).toHaveBeenCalledWith({
                 achievementId: button.getAttribute("achievement-id"),
                 content: "test prompt"
             });
         });
-        prompt = originalPrompt;
 
+        mockPrompt.mockReset();
         spyRecordElement.mockReset();
     });
 
