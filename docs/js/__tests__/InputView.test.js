@@ -1,4 +1,4 @@
-import { InputView } from "../main.js";
+import { InputView } from "../InputView.js";
 
 describe("InputView", () => {
     let inputView;

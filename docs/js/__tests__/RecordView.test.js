@@ -1,4 +1,4 @@
-import { RecordView } from "../main.js";
+import { RecordView } from "../RecordView.js";
 import { validAchievements, validStars, validRecords } from "./testData.js";
 
 describe("RecordView", () => {

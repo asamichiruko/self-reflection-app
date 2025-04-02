@@ -1,4 +1,4 @@
-import { RecordViewModel } from "../main.js";
+import { RecordViewModel } from "../RecordViewModel.js";
 import { validAchievements, validRecords, validStars } from "./testData.js";
 
 describe("RecordViewModel", () => {

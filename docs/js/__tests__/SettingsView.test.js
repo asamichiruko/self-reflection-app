@@ -1,5 +1,4 @@
-import { afterEach } from "vitest";
-import { SettingsView } from "../main.js";
+import { SettingsView } from "../SettingsView.js";
 
 describe("SettingsView", () => {
     let mockRecordViewModel;

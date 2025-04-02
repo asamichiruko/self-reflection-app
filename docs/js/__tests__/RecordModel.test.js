@@ -1,4 +1,4 @@
-import { RecordModel } from "../main.js";
+import { RecordModel } from "../RecordModel.js";
 import { validAchievements, validRecords, validStars } from "./testData.js";
 
 describe("RecordModel", () => {
@@ -73,9 +73,10 @@ describe("RecordModel", () => {
         mockStorage.getAchievements.mockReturnValue(validAchievements);
         mockStorage.getStars.mockReturnValue(validStars);
 
-        const json = JSON.parse(recordModel.exportAsJsonString());
-        expect(json.achievements).toEqual(validAchievements);
-        expect(json.stars).toEqual(validStars);
+        const jsonString = recordModel.exportAsJsonString();
+        expect(jsonString).toEqual(
+            JSON.stringify({ achievements: validAchievements, stars: validStars })
+        );
     });
 
     test("JSON文字列からrecordをimportするとlistenerが呼ばれる", () => {

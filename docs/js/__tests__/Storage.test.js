@@ -1,4 +1,4 @@
-import { Storage } from "../main.js";
+import { Storage } from "../Storage.js";
 import { validAchievements, validStars } from "./testData.js";
 
 describe("Storage", () => {
