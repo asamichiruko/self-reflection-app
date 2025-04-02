@@ -418,20 +418,23 @@ export class InputView {
 
         this.achievementInput = document.getElementById("achievement");
         this.saveButton = document.getElementById("save-btn");
-        this.saveButton.addEventListener("click", this.addAchievementEventListener.bind(this));
-    }
 
-    render() {}
-
-    addAchievementEventListener() {
-        if (!this.achievementInput.value) {
-            alert("できたことを入力してください");
-            return;
-        }
-        this.recordViewModel.addAchievement({ content: this.achievementInput.value });
-        this.achievementInput.value = "";
-        alert("できたことを記録しました！");
-        this.tabViewModel.setActiveTab("list");
+        this.saveButton.addEventListener("click", () => {
+            if (!this.achievementInput.value) {
+                alert("できたことを入力してください");
+                return;
+            }
+            const result = this.recordViewModel.addAchievement({
+                content: this.achievementInput.value
+            });
+            if (result) {
+                this.achievementInput.value = "";
+                alert("できたことを記録しました！");
+                this.tabViewModel.setActiveTab("list");
+            } else {
+                alert("記録に失敗しました。時間をおいて再度お試しください");
+            }
+        });
     }
 }
 
@@ -524,39 +527,32 @@ export class SettingsView {
         this.recordViewModel = recordViewModel;
 
         this.exportButton = document.getElementById("export-btn");
-        this.exportButton.addEventListener("click", this.exportRecordsEventListener.bind(this));
+        this.exportButton.addEventListener("click", () => {
+            const jsonString = this.recordViewModel.exportAsJsonString();
+            const blob = new Blob([jsonString], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "export_data.json";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        });
 
         this.importFile = document.getElementById("import-file");
         this.importButton = document.getElementById("import-btn");
-        this.importButton.addEventListener("click", this.importRecordsEventListener.bind(this));
-    }
-
-    render() {}
-
-    exportRecordsEventListener() {
-        const jsonString = this.recordViewModel.exportAsJsonString();
-        const blob = new Blob([jsonString], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = "export_data.json";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    }
-
-    async importRecordsEventListener() {
-        const file = this.importFile.files[0];
-        if (!file || file.type !== "application/json") {
-            console.log(file);
-            alert(".json形式のファイルを選択してください");
-            return;
-        }
-        const jsonString = await file.text();
-        const result = this.recordViewModel.importFromJsonString(jsonString);
-        if (result) {
-            alert("データの復元を完了しました");
-        }
+        this.importButton.addEventListener("click", async () => {
+            const file = this.importFile.files[0];
+            if (!file || file.type !== "application/json") {
+                alert(".json形式のファイルを選択してください");
+                return;
+            }
+            const jsonString = await file.text();
+            const result = this.recordViewModel.importFromJsonString(jsonString);
+            if (result) {
+                alert();
+            }
+        });
     }
 }
