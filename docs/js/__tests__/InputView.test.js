@@ -1,7 +1,6 @@
 import { InputView } from "../InputView.js";
 
 describe("InputView", () => {
-    let inputView;
     let mockRecordViewModel;
     let mockTabViewModel;
     let textInput;
@@ -21,7 +20,7 @@ describe("InputView", () => {
         mockTabViewModel = {
             setActiveTab: vi.fn()
         };
-        inputView = new InputView(mockRecordViewModel, mockTabViewModel);
+        new InputView(mockRecordViewModel, mockTabViewModel);
     });
 
     afterEach(() => {
