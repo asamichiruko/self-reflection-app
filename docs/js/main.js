@@ -16,8 +16,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const recordModel = new RecordModel(storage);
     const recordViewModel = new RecordViewModel(recordModel);
 
-    const tabView = new TabView(tabViewModel);
-    const inputView = new InputView(recordViewModel, tabViewModel);
-    const recordView = new RecordView(recordViewModel);
-    const settingsView = new SettingsView(recordViewModel);
+    new TabView(tabViewModel);
+    new InputView(recordViewModel, tabViewModel);
+    new RecordView(recordViewModel);
+    new SettingsView(recordViewModel);
 });

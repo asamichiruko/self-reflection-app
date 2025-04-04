@@ -119,6 +119,7 @@ export class Storage {
         let isValid = true;
         isValid = isValid && this.isValidId(id);
         isValid = isValid && this.isValidId(achievementId);
+        isValid = isValid && typeof content == "string";
         isValid = isValid && new Date(date).toString() !== "Invalid Date";
 
         return isValid;
