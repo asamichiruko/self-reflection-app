@@ -56,7 +56,17 @@ export class RecordModel {
     }
 
     importFromJsonString(jsonString) {
-        const parsedData = JSON.parse(jsonString);
+        let parsedData;
+        try {
+            parsedData = JSON.parse(jsonString);
+        } catch (err) {
+            if (err instanceof SyntaxError) {
+                console.warn(`JSON Syntax Error: ${err.message}`);
+                return false;
+            } else {
+                throw err;
+            }
+        }
         let achievements = parsedData["achievements"];
         let stars = parsedData["stars"];
         if (!Array.isArray(achievements) || !Array.isArray(stars)) {

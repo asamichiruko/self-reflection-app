@@ -82,4 +82,18 @@ describe("SettingsView", () => {
         expect(mockRecordViewModel.importFromJsonString).not.toHaveBeenCalled();
         expect(file.text).not.toHaveBeenCalledWith();
     });
+
+    test("importイベントでJSONの書式が不正なときは復元しない", async () => {
+        document.createElement("input");
+        const file = new File(["invalid json"], "test.json", { type: "application/json" });
+        if (!file.text) {
+            file.text = vi.fn();
+        }
+        vi.spyOn(file, "text").mockReturnValue("invalid json");
+        settingsView.importFile = {
+            files: [file]
+        };
+        await settingsView.importButton.click();
+        assert.doesNotThrow(mockRecordViewModel.importFromJsonString);
+    });
 });

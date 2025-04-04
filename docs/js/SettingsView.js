@@ -27,7 +27,11 @@ export class SettingsView {
             const jsonString = await file.text();
             const result = this.recordViewModel.importFromJsonString(jsonString);
             if (result) {
-                alert();
+                alert("データを復元しました");
+            } else {
+                alert(
+                    "データの復元に失敗しました。選択したデータの内容を確認し、時間をおいて再度お試しください"
+                );
             }
         });
     }
