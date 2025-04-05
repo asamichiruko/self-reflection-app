@@ -24,7 +24,7 @@ describe("TabView", () => {
         mockTabViewModel = {
             subscribe: vi.fn(),
             notify: vi.fn(),
-            getActiveTab: vi.fn()
+            getActiveTab: vi.fn(() => "input")
         };
         tabView = new TabView(mockTabViewModel);
     });
@@ -53,5 +53,13 @@ describe("TabView", () => {
                 expect(tabContent.classList).not.toContain("active");
             }
         }
+    });
+
+    test("存在しないタブを開こうとした場合は何もしない", () => {
+        const beforeTab = document.querySelector(".active").getAttribute("tab-name");
+        console.log(beforeTab);
+        tabView.render("invalid-tabname");
+        const afterTab = document.querySelector(".active").getAttribute("tab-name");
+        expect(beforeTab).toBe(afterTab);
     });
 });

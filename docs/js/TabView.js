@@ -17,6 +17,11 @@ export class TabView {
     }
 
     render(activeTab) {
+        const tab = document.querySelector(`.tab[tab-name='${activeTab}']`);
+        if (!tab) {
+            return;
+        }
+
         this.tabElements.forEach((tab) => {
             if (tab.getAttribute("tab-name") === activeTab) {
                 tab.classList.add("active");
