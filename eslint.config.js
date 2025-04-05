@@ -5,12 +5,18 @@ import vitest from "@vitest/eslint-plugin";
 import eslintConfigPrettier from "eslint-config-prettier";
 
 export default defineConfig([
-    { files: ["**/*.{js,mjs,cjs}"] },
     {
         files: ["**/*.{js,mjs,cjs}"],
-        languageOptions: { globals: { ...globals.browser, ...globals.node } }
+        languageOptions: {
+            globals: { ...globals.browser, ...globals.node }
+        },
+        plugins: { js },
+        parserOptions: {
+            ecmaVersion: "latest",
+            sourceType: "module"
+        },
+        extends: ["js/recommended", "prettier"]
     },
-    { files: ["**/*.{js,mjs,cjs}"], plugins: { js }, extends: ["js/recommended"] },
     {
         files: ["**/__tests__/**/*.test.{js,mjs,cjs}"],
         plugins: {
